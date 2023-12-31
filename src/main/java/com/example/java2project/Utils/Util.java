@@ -54,22 +54,22 @@ public class Util {
 
     // 过滤并保留异常
     public static List<Data> filterExceptions(List<Data> lines) {
-        return filterByRegex(lines, "\\b(?:" +
+        return filterByRegex(lines, "\\b(?i:" +
                 "NullPointerException|IOException|" +
                 "SQLException|RuntimeException|ArithmeticException|" +
                 "IllegalArgumentException|IllegalStateException|NumberFormatException|" +
                 "IndexOutOfBoundsException|NoSuchMethodException|UnsupportedOperationException|" +
-                "NoSuchFieldException|ClassCastException|ClassNotFoundException)\\b");
+                "NoSuchFieldException|ClassCastException|ClassNotFoundException|exception)\\b");
     }
 
     // 过滤并保留语法错误
     public static List<Data> filterSyntaxErrors(List<Data> lines) {
-        return filterByRegex(lines, "\\b(?:Syntax\\sError|Compilation\\sError|Compile\\sTime\\sError|cannot\\sresolve\\ssymbol|expected\\s\\S+|unexpected\\stoken|missing\\s\\S+|invalid\\smethod\\sdeclaration|';'\\sexpected|illegal\\sstart\\sof\\sexpression)\\b");
+        return filterByRegex(lines, "\\b(?i:Syntax\\sError|Compilation\\sError|Compile\\sTime\\sError|cannot\\sresolve\\ssymbol|expected\\s\\S+|unexpected\\stoken|missing\\s\\S+|invalid\\smethod\\sdeclaration|';'\\sexpected|illegal\\sstart\\sof\\sexpression)\\b");
     }
 
     // 过滤并保留致命错误
     public static List<Data> filterFatalErrors(List<Data> lines) {
-        return filterByRegex(lines, "\\b(?:OutOfMemoryError|StackOverflowError|Fatal\\sError|NoClassDefFoundError|VirtualMachineError|ThreadDeath)\\b");
+        return filterByRegex(lines, "\\b(?i:OutOfMemoryError|StackOverflowError|Fatal\\sError|NoClassDefFoundError|VirtualMachineError|ThreadDeath)\\b");
     }
 
     // 使用正则表达式过滤列表
@@ -84,6 +84,29 @@ public class Util {
             }
         }
         return filteredLines;
+    }
+
+
+    /**
+     *
+     * @param lines 数据
+     * @param regex 正则表达式匹配
+     * @return 每个string出现的次数
+     */
+    public static Map<String, Integer> matchByRegex(List<Data> lines, String regex) {
+        Map<String, Integer> match = new HashMap<>();
+        Pattern pattern = Pattern.compile(regex);
+
+        for (Data line : lines) {
+            Matcher matcher = pattern.matcher(line.getTitle());
+            if (matcher.find()) {
+                String exp = matcher.group().toLowerCase();
+                if (!exp.equals("exception")) {
+                    match.put(exp, match.getOrDefault(exp, 0) + line.getView_count());
+                }
+            }
+        }
+        return match;
     }
 
 }

@@ -103,7 +103,7 @@ public class DataServiceImpl implements DataService {
                 "ClassCastException", "ArithmeticException", "IllegalStateException"
         );
         for (String s: ss) {
-            String regex = String.format("\\b(?:%s)\\b", s);
+            String regex = String.format("\\b(?i:%s)\\b", s);
             List<Data> e = Util.filterByRegex(exceptionData, regex);
             res.put(s, e.stream().mapToInt(Data::getView_count).sum());
         }
@@ -131,21 +131,51 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public List<Map<String, Object>> getTopNBugsPopularity(int n) {
+        List<Data> bugData = getBugInformation();
+        String regex = "\\b(?i:" +
+                "NullPointerException|IOException|" +
+                "SQLException|RuntimeException|ArithmeticException|" +
+                "IllegalArgumentException|IllegalStateException|NumberFormatException|" +
+                "IndexOutOfBoundsException|NoSuchMethodException|UnsupportedOperationException|" +
+                "NoSuchFieldException|ClassCastException|ClassNotFoundException|" +
+                "Syntax\\sError|Compilation\\sError|" +
+                "Compile\\sTime\\sError|cannot\\sresolve\\ssymbol|" +
+                "expected\\s\\S+|unexpected\\stoken|missing\\s\\S+|invalid\\smethod\\sdeclaration|" +
+                "';'\\sexpected|illegal\\sstart\\sof\\sexpression|" +
+                "OutOfMemoryError|StackOverflowError|Fatal\\sError|" +
+                "NoClassDefFoundError|VirtualMachineError|ThreadDeath|" +
+                "exception)\\b";
+
+        List<Data> e = Util.filterByRegex(bugData, regex);
+        Map<String, Integer> bugs = Util.matchByRegex(e, regex);
+
+        List<Map.Entry<String, Integer>> topNEntries = bugs.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())  // 根据值降序排序
+                .limit(n)  // 限制为前n个元素
+                .collect(Collectors.toList());
+
+
         List<Map<String, Object>> res = new ArrayList<>();
-        List<Tag> tagList = dataMapper.getTags();
-        tagList.forEach(tag -> {
-            tag.setTag_id(dataMapper.getAverageViewCountOfTags(tag.getTag_name()));
-        });
-        PriorityQueue<Tag> maxHeap = new PriorityQueue<>((Tag t1, Tag t2) -> t2.getTag_id() - t1.getTag_id());
-        maxHeap.addAll(tagList);
-        for (int i = 0; i < n; i++) {
-            Tag t = maxHeap.poll();
+        topNEntries.forEach( stringIntegerEntry -> {
             Map<String, Object> map = new HashMap<>();
-            map.put("popularity", t.getTag_id());
-            map.put("topic", t.getTag_name());
+            map.put("error", stringIntegerEntry.getKey());
+            map.put("popularity", stringIntegerEntry.getValue());
             res.add(map);
-        }
+        });
         return res;
+    }
+
+    @Override
+    public Integer getBugPopularity(String bugName) {
+        List<Data> bugData = getBugInformation();
+        String regex = String.format("\\b(?i:%s)\\b", bugName);
+        List<Data> e = Util.filterByRegex(bugData, regex);
+        return e.stream().mapToInt(Data::getView_count).sum();
+    }
+
+    @Override
+    public List<Map<String, Object>> getRelatedTopics(String topicName) {
+        return null;
     }
 
 

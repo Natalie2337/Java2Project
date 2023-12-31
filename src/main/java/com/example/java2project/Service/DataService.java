@@ -2,6 +2,7 @@ package com.example.java2project.Service;
 
 import com.example.java2project.pojo.Data.Data;
 import com.example.java2project.pojo.Data.Tag;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ public interface DataService {
     public Map<String, Integer> getViewCountOfRuntimeException();
     public List<Map<String, Object>> getTopNTopicsPopularity(int n);
     public List<Map<String, Object>> getTopNBugsPopularity(int n);
-
-
+    public Integer getBugPopularity(String bugName);
+    public List<Map<String, Object>> getRelatedTopics(String topicName);
 
 }

@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "localhost")
+
 public class DataController {
 
     @Autowired
@@ -151,22 +151,25 @@ public class DataController {
     }
 
     //restapi
-    @GetMapping("/bugs/popularity/{errorName}")
-    public List<Map<String, Object>> getBugPopularity(@PathVariable String errorName) {
-        return null;
+    @GetMapping("/bugs/popularity/{bugName}")
+    public Map<String, Object> getBugPopularity(@PathVariable String bugName) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("popularity", dataService.getBugPopularity(bugName));
+        map.put("topic", bugName);
+        return map;
     }
 
     //restapi
     @GetMapping("/bugs/popularity")
     public List<Map<String, Object>> getTopNBugsPopularity(@RequestParam(name = "topN") Integer N) {
-        return dataService.getTopNTopicsPopularity(N);
+        return dataService.getTopNBugsPopularity(N);
     }
 
     //restapi
     @GetMapping("/topics/related")
     public Map<String, Object> getRelatedTopics(@RequestParam(name = "input") String topicName) {
         Map<String, Object> map = new HashMap<>();
-        map.put("popularity", dataService.getAverageViewCountOfTag(topicName));
+        map.put("intimacy", dataService.getAverageViewCountOfTag(topicName));
         map.put("topic", topicName);
         return map;
     }
