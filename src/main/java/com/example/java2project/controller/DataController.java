@@ -179,9 +179,6 @@ public class DataController {
      */
     @GetMapping("/tag/proportion")
     public Result getTagProportion(String tag) {
-        if (true) {
-            return Result.success(tag.length());
-        }
         try {
             Double res = dataService.getTagProportion(tag);
             return Result.success(res);
