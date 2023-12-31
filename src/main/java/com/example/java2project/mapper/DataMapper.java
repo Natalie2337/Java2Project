@@ -69,4 +69,7 @@ public interface DataMapper {
             select * from bugs
             """)
     public List<Data> getBugInformation();
+
+    @Select("select * from questions;")
+    public List<Data> getData();
 }

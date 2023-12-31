@@ -7,6 +7,7 @@ import com.example.java2project.pojo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,63 @@ public class DataController {
         }
     }
 
+    /**
+     * 计算tags的平均view-count
+     *
+     * @return 平均view-count
+     */
+    @GetMapping("/tags/view-count")
+    public Result getAverageViewCountOfTag() {
+        try {
+            Map<String, Integer> res = new HashMap<>();
+            List<Tag> tags = dataService.getTagList();
+            tags.stream().forEach(tag -> {
+                res.put(tag.getTag_name(), dataService.getAverageViewCountOfTag(tag.getTag_name()));
+            });
+            return Result.success(res);
+        } catch (Exception e) {
+            return Result.error("exception occur");
+        }
+    }
+
+    /**
+     * 计算tag的平均answer-count
+     *
+     * @return 平均answer-count
+     */
+    @GetMapping("/tags/answer-count")
+    public Result getAverageAnswerCountOfTag() {
+        try {
+            Map<String, Integer> res = new HashMap<>();
+            List<Tag> tags = dataService.getTagList();
+            tags.stream().forEach(tag -> {
+                res.put(tag.getTag_name(), dataService.getAverageAnswerCountOfTag(tag.getTag_name()));
+            });
+
+            return Result.success(res);
+        } catch (Exception e) {
+            return Result.error("exception occur");
+        }
+    }
+
+
+    /**
+     * @return tag在所有question中的比例
+     */
+    @GetMapping("/tags/proportion")
+    public Result getTagProportion() {
+        try {
+            Map<String, Double> res = new HashMap<>();
+            List<Tag> tags = dataService.getTagList();
+            tags.stream().forEach(tag -> {
+                res.put(tag.getTag_name(), dataService.getTagProportion(tag.getTag_name()));
+            });
+            return Result.success(res);
+        } catch (Exception e) {
+            return Result.error("exception occur");
+        }
+    }
+
 
     /**
      * 计算tag的平均view-count
@@ -48,7 +106,6 @@ public class DataController {
         } catch (Exception e) {
             return Result.error("exception occur");
         }
-
     }
 
     /**

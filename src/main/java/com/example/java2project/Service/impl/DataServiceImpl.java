@@ -175,6 +175,9 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public List<Map<String, Object>> getRelatedTopics(String topicName) {
+        List<Data> bugData = dataMapper.getData();
+        String regex = String.format("\\b(?i:%s)\\b", topicName);
+        List<Data> relate = Util.filterByRegex(bugData, regex);
         return null;
     }
 
