@@ -24,6 +24,9 @@ public interface DataService {
     public Integer getViewCountOfSyntaxError();
     public Integer getViewCountOfFatalError();
     public Map<String, Integer> getViewCountOfRuntimeException();
+    public List<Map<String, Object>> getTopNTopicsPopularity(int n);
+    public List<Map<String, Object>> getTopNBugsPopularity(int n);
+
 
 
 }

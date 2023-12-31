@@ -5,12 +5,15 @@ import com.example.java2project.Utils.Util;
 import com.example.java2project.mapper.DataMapper;
 import com.example.java2project.pojo.Data.Data;
 import com.example.java2project.pojo.Data.Tag;
+import com.fasterxml.jackson.databind.ObjectReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class DataServiceImpl implements DataService {
@@ -103,6 +106,44 @@ public class DataServiceImpl implements DataService {
             String regex = String.format("\\b(?:%s)\\b", s);
             List<Data> e = Util.filterByRegex(exceptionData, regex);
             res.put(s, e.stream().mapToInt(Data::getView_count).sum());
+        }
+        return res;
+    }
+
+    @Override
+    public List<Map<String, Object>> getTopNTopicsPopularity(int n) {
+        List<Map<String, Object>> res = new ArrayList<>();
+        List<Tag> tagList = dataMapper.getTags();
+        tagList.forEach(tag -> {
+            tag.setTag_id(dataMapper.getAverageViewCountOfTags(tag.getTag_name()));
+        });
+        PriorityQueue<Tag> maxHeap = new PriorityQueue<>((Tag t1, Tag t2) -> t2.getTag_id() - t1.getTag_id());
+        maxHeap.addAll(tagList);
+        for (int i = 0; i < n; i++) {
+            Tag t = maxHeap.poll();
+            Map<String, Object> map = new HashMap<>();
+            map.put("popularity", t.getTag_id());
+            map.put("topic", t.getTag_name());
+            res.add(map);
+        }
+        return res;
+    }
+
+    @Override
+    public List<Map<String, Object>> getTopNBugsPopularity(int n) {
+        List<Map<String, Object>> res = new ArrayList<>();
+        List<Tag> tagList = dataMapper.getTags();
+        tagList.forEach(tag -> {
+            tag.setTag_id(dataMapper.getAverageViewCountOfTags(tag.getTag_name()));
+        });
+        PriorityQueue<Tag> maxHeap = new PriorityQueue<>((Tag t1, Tag t2) -> t2.getTag_id() - t1.getTag_id());
+        maxHeap.addAll(tagList);
+        for (int i = 0; i < n; i++) {
+            Tag t = maxHeap.poll();
+            Map<String, Object> map = new HashMap<>();
+            map.put("popularity", t.getTag_id());
+            map.put("topic", t.getTag_name());
+            res.add(map);
         }
         return res;
     }
